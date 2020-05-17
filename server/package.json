@@ -1,0 +1,42 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "12.16.0",
+    "npm": "6.13.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "server": "nodemon --inspect index.js",
+    "client": "npm run start --prefix client",
+		"dev": "concurrently \"npm run server \" \"npm run client \"",
+		"debug": "node --inspect index.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^7.1.0",
+    "body-parser": "^1.19.0",
+    "concurrently": "^5.1.0",
+    "cookie-session": "^1.4.0",
+    "express": "^4.17.1",
+    "lodash": "^4.17.15",
+    "mongoose": "^5.9.7",
+    "nodemon": "^2.0.2",
+    "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0",
+    "path-parser": "^6.1.0",
+    "save": "^2.4.0",
+    "sendgrid": "^5.2.3",
+    "stripe": "^8.44.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}
