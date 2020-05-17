@@ -10,7 +10,7 @@ class SurveyList extends React.Component {
 	renderGrid = () => {
 		return this.props.surveys.reverse().map(survey => {
 			return (
-				<div className="card darken-1" key={survey._id}>
+				<div className="card teal lighten-4" key={survey._id}>
 					<div className="card-content">
 						<span className="card-title">{survey.title}</span>
 						<p>
@@ -20,7 +20,7 @@ class SurveyList extends React.Component {
 							Sent On: {new Date(survey.dateSent).toLocaleString()}
 						</p>
 					</div>
-					<div className="card-action">
+					<div className="card-action teal">
 						<a>Yes: {survey.yes}</a>
 						<a>No: {survey.no}</a>
 					</div>
