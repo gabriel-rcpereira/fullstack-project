@@ -13,19 +13,9 @@ const surveyTemplate = require('../emailTemplate/surveyTemplate');
 
 module.exports = app => {	
 
-	app.get('/api/surveys', requireLogin, async (req, res) => {	
-		console.log(req.user.id);
-		const surveyFilter = { _user: req.user.id };
-		const excludeColumn = { recipients: false };
-		const surveys = await Survey.find(surveyFilter)
-			.select(excludeColumn);
-
-		res.status(200).send(surveys);
-	});
-
 	app.get('/api/surveys/thanks', (req, res) => {
-		const s = 'Thanks for your answer!';
-		res.status(200).send(s);
+		const message = 'Thanks for your answer!';
+		res.status(200).send(message);
 	});
 
 	app.post('/api/surveys/webhook', (req, res) => {
@@ -63,6 +53,15 @@ module.exports = app => {
 		res.status(200).send();
 	});
 
+	app.get('/api/surveys', requireLogin, async (req, res) => {	
+		const surveyFilter = { _user: req.user.id };
+		const excludeColumn = { recipients: false };
+		const surveys = await Survey.find(surveyFilter)
+			.select(excludeColumn);
+
+		res.status(200).send(surveys);
+	});	
+
 	app.post(
 		'/api/surveys', 
 		requireLogin, requireCredit, 
@@ -79,9 +78,7 @@ module.exports = app => {
 
 			try {
 				await mailer(survey, surveyTemplate(survey));
-
 				await survey.save();
-
 				const userSaved = await discountUserCredit(req);
 
 				res.status(201).send(userSaved);
@@ -89,6 +86,12 @@ module.exports = app => {
 				res.status(422).send(error);
 			}
 		});	
+
+	app.delete('/api/surveys/:id', requireLogin, async (req, res) => {
+		await Survey.deleteOne({ _id: req.params.id });
+		res.status(204).send();
+	});
+
 };
 
 function discountUserCredit(req) {
