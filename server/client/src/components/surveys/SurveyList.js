@@ -1,17 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
-
+import Select from 'react-select';
 import axios from 'axios';
 
 import { fetchSurveys } from '../../actions';
 
 import ModalConfirm from '../modals/ModalConfirm';
 
+const optionsToSort = [
+	{ value: '1', label: 'Sent Date', column: 'dateSent'},
+	{ value: '2', label: 'Survey Title', column: 'title'}
+];
+
 class SurveyList extends React.Component {
 
 	state = {
 		surveyIdToDelete: null,
-		surveyTitleToDelete: null
+		surveyTitleToDelete: null,
+		columnSelectedToSort: null
 	}
 
 	componentDidMount() {
@@ -22,11 +28,29 @@ class SurveyList extends React.Component {
 		const surveys = this.props.surveys;
 
 		if (surveys && surveys.length > 0) {
-			return this.renderGrid();
+			return (
+				<div>
+					<div style={{marginTop: '20px'}}>
+						<Select
+							value={this.state.columnSelectedToSort}
+							onChange={this.setColumnToSort}
+							options={optionsToSort}
+							placeholder="Sort by..."
+						/>
+					</div>
+					{this.renderGrid()}
+				</div>
+			);
 		}
 		
 		return this.renderNoSurveysMessage();		
 	}
+
+	setColumnToSort = columnSelectedToSort => {
+		this.setState({ 
+			columnSelectedToSort 
+		});
+	};
 
 	setModalRef = (e) => {
 		this.modalRef = e;
@@ -64,31 +88,47 @@ class SurveyList extends React.Component {
 		});
 	}
 
+	sortSurveys = () => {
+		const valueSelected = this.state.columnSelectedToSort;
+		const surveys = this.props.surveys;
+
+		if (valueSelected.column === 'title') {
+			return surveys
+				.sort((a, b) => a.title?.localeCompare(b.title));
+		} else {
+			return surveys
+				.sort((a, b) => a.dateSent?.localeCompare(b.dateSent));
+		}
+	}
+
 	renderGrid = () => {
-		return this.props.surveys.reverse().map(survey => {
-			return (
-				<div className="card teal lighten-4" key={survey._id}>
-					<div className="card-content">
-						<span className="card-title">{survey.title}</span>
-						<p>
-							{survey.body}
-						</p>
-						<p className="right">
-							Sent On: {new Date(survey.dateSent).toLocaleString()}
-						</p>
-					</div>
-					<div className="card-action teal lighten-2">
-						<a className="white-text">Yes: {survey.yes}</a>
-						<a className="white-text">No: {survey.no}</a>
-						<div className="right">
-							<button className="teal lighten-2 btn-flat right black-text" onClick={() => this.handleDeleteSurvey(survey)}>
-								<i className="small material-icons">delete</i>
-							</button>
+		const surveys = this.state.columnSelectedToSort ? this.sortSurveys() : this.props.surveys;
+
+		return surveys
+			?.map(survey => {
+				return (
+					<div className="card teal lighten-4" key={survey._id}>
+						<div className="card-content">
+							<span className="card-title">{survey.title}</span>
+							<p>
+								{survey.body}
+							</p>
+							<p className="right">
+								Sent On: {new Date(survey.dateSent).toLocaleString()}
+							</p>
+						</div>
+						<div className="card-action teal lighten-2 white-text">
+							<a className="white-text">Yes: {survey.yes}</a>
+							<a className="white-text">No: {survey.no}</a>
+							<div className="right">
+								<button className="teal lighten-2 btn-flat right black-text" onClick={() => this.handleDeleteSurvey(survey)}>
+									<i className="small material-icons">delete</i>
+								</button>
+							</div>
 						</div>
 					</div>
-				</div>
-			);
-		});
+				);
+			});
 	}
 
 	render() {
@@ -102,7 +142,7 @@ class SurveyList extends React.Component {
 				>
 					The Survey <b>{this.state.surveyTitleToDelete}</b> will be deleted. Could you confirm?
 				</ModalConfirm>
-				{this.props.surveys && this.props.surveys.length > 0 ? this.renderGrid() : this.renderScreen()}
+				{this.renderScreen()}
 			</div>
 		);
 	}

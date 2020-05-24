@@ -12,8 +12,8 @@
     "start": "node index.js",
     "server": "nodemon --inspect index.js",
     "client": "npm run start --prefix client",
-		"dev": "concurrently \"npm run server \" \"npm run client \"",
-		"debug": "node --inspect index.js",
+    "dev": "concurrently \"npm run server \" \"npm run client \"",
+    "debug": "node --inspect index.js",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "author": "",

@@ -23,19 +23,23 @@ const SurveyReview = ({ onCancel, values, submitSurvey, history }) => {
 	return (
 		<div>
 			<h5>Please confirm your entries</h5>
-			{fieldsToReview}
-			<button 
-				className="yellow darken-3 btn-flat" 
-				onClick={onCancel}>
-					Cancel
-			</button>
-			<button
-				className ="green btn-flat right"
-				onClick={() => submitSurvey(values, history)}
-			>
-				Send Survey
-				<i className="material-icons right">email</i>
-			</button>
+			<div style={{ marginBottom: '20px' }}>
+				{fieldsToReview}
+			</div>
+			<div>
+				<button 
+					className="yellow darken-3 btn-flat" 
+					onClick={onCancel}>
+						Cancel
+				</button>
+				<button
+					className ="green btn-flat right"
+					onClick={() => submitSurvey(values, history)}
+				>
+					Send Survey
+					<i className="material-icons right">email</i>
+				</button>
+			</div>
 		</div>
 	);
 };
