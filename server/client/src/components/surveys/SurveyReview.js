@@ -4,9 +4,10 @@ import { withRouter } from 'react-router-dom';
 
 import _ from 'lodash';
 
+import './styles/Survey.scss';
+
 import formFields from './formFields';
 import * as actions from '../../actions';
-
 
 const SurveyReview = ({ onCancel, values, submitSurvey, history }) => {
 	const fieldsToReview = _.map(formFields, ({ name, label }) => {
@@ -23,23 +24,27 @@ const SurveyReview = ({ onCancel, values, submitSurvey, history }) => {
 	return (
 		<div>
 			<h5>Please confirm your entries</h5>
-			<div style={{ marginBottom: '20px' }}>
+			<div className="form-new-survey">
 				{fieldsToReview}
 			</div>
-			<div>
-				<button 
-					className="yellow darken-3 btn-flat" 
-					onClick={onCancel}>
-						Cancel
-				</button>
-				<button
-					className ="green btn-flat right"
-					onClick={() => submitSurvey(values, history)}
-				>
-					Send Survey
-					<i className="material-icons right">email</i>
-				</button>
-			</div>
+			<button 
+				className="yellow darken-3 btn-flat" 
+				onClick={onCancel}>
+					Cancel
+			</button>
+			<button
+				className ="green btn-flat right custom-button"
+				onClick={() => submitSurvey(values, history)}
+			>
+				Send
+				<i className="material-icons right">send</i>
+			</button>
+			<button 
+				className ="green btn-flat right custom-button"
+			>
+				Save
+				<i className="material-icons right">save</i>
+			</button>				
 		</div>
 	);
 };
