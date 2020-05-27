@@ -4,8 +4,8 @@ const keys = require('../config/keys');
 const Mailer = async ({ subject, recipients }, content) => {
 	setApiKey();
 	const recipientsTreated = mapRecipients(recipients);
-	const msg = buildMessage(recipientsTreated, subject, content);
-	await helper.sendMultiple(msg);
+	const message = buildMessage(recipientsTreated, subject, content);
+	await helper.sendMultiple(message);
 };
 
 function buildMessage(recipientsTreated, subject, content) {

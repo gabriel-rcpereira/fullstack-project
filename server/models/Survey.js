@@ -1,6 +1,7 @@
 const moongose = require('mongoose');
 const { Schema } = moongose;
 const RecipientSchema = require('./Recipient');
+const { DRAFT } = require('./surveyStatus');
 
 const surveySchema = new Schema({
 	title: String,
@@ -11,7 +12,8 @@ const surveySchema = new Schema({
 	no: { type: Number, default: 0 },
 	_user: { type: Schema.Types.ObjectId, ref: 'users' },
 	dateSent: Date,
-	lastResponded: Date
+	lastResponded: Date,
+	status: { type: String, default: DRAFT }
 });
 
 moongose.model('surveys', surveySchema);

@@ -9,7 +9,7 @@ import './styles/Survey.scss';
 import formFields from './formFields';
 import * as actions from '../../actions';
 
-const SurveyReview = ({ onCancel, values, submitSurvey, history }) => {
+const SurveyReview = ({ onCancel, values, submitSurvey, saveSurvey, history }) => {
 	const fieldsToReview = _.map(formFields, ({ name, label }) => {
 		return (
 			<div key={name}>
@@ -41,6 +41,7 @@ const SurveyReview = ({ onCancel, values, submitSurvey, history }) => {
 			</button>
 			<button 
 				className ="green btn-flat right custom-button"
+				onClick={() => saveSurvey(values, history)}
 			>
 				Save
 				<i className="material-icons right">save</i>

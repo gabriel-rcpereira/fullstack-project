@@ -68,6 +68,11 @@ class SurveyList extends React.Component {
 		this.setSurveyToDelete(_id, title);
 		this.modalRef.click();
 	}
+
+	sendSurvey = async ({ _id }) => {
+		await axios.post(`/api/v2/surveys/${_id}`);
+		this.props.fetchSurveys();
+	}
 	
 	deleteSurvey = async () => {
 		await axios.delete(`/api/surveys/${this.state.surveyIdToDelete}`);
@@ -101,6 +106,23 @@ class SurveyList extends React.Component {
 		}
 	}
 
+	renderSentOnMessage = (survey) => {
+		return (
+			`Sent On: ${new Date(survey.dateSent).toLocaleString()}`
+		);
+	}
+
+	renderSendButton = (survey) => {
+		return (
+			<button 
+				className="teal lighten-2 btn-flat black-text" 
+				onClick={() => this.sendSurvey(survey)}
+			>
+				<i className="small material-icons">send</i>
+			</button>
+		);
+	}
+
 	renderGrid = () => {
 		const surveys = this.state.columnSelectedToSort ? this.sortSurveys() : this.props.surveys;
 
@@ -114,13 +136,14 @@ class SurveyList extends React.Component {
 								{survey.body}
 							</p>
 							<p className="right">
-								Sent On: {new Date(survey.dateSent).toLocaleString()}
+								{survey.dateSent ? this.renderSentOnMessage(survey) : 'Survey not sent'}
 							</p>
 						</div>
 						<div className="card-action teal lighten-2 white-text">
 							<a className="white-text">Yes: {survey.yes}</a>
 							<a className="white-text">No: {survey.no}</a>
 							<div className="right">
+								{ !survey.dateSent && this.renderSendButton(survey) }
 								<button className="teal lighten-2 btn-flat right black-text" onClick={() => this.handleDeleteSurvey(survey)}>
 									<i className="small material-icons">delete</i>
 								</button>

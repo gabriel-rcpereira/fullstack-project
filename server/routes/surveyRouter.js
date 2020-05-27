@@ -7,6 +7,7 @@ const requireCredit = require('../middlewares/requireCredit');
 
 const mongoose = require('mongoose');
 const Survey = mongoose.model('surveys');
+const { DRAFT, SENT } = require('../models/surveyStatus');
 
 const mailer = require('../services/Mailer');
 const surveyTemplate = require('../emailTemplate/surveyTemplate');
@@ -55,30 +56,41 @@ module.exports = app => {
 
 	app.get('/api/surveys', requireLogin, async (req, res) => {	
 		const surveyFilter = { _user: req.user.id };
-		const excludeColumn = { recipients: false };
+		const columnToExclude = { recipients: false };
 		const surveys = await Survey.find(surveyFilter)
-			.select(excludeColumn);
+			.select(columnToExclude);
 
 		res.status(200).send(surveys);
 	});	
 
 	app.post(
+		'/api/v2/surveys/drafts', 
+		requireLogin, 
+		async (req, res) => {
+			await saveSurveyDraft(req.body, req.user.id);
+			res.status(201).send();
+		}
+	);
+
+	app.post(
+		'/api/v2/surveys/:id', 
+		requireLogin, requireCredit,
+		async (req, res) => {
+			const surveyUpdated = await updateSurveyToSent(req.params.id);
+			await mailer(surveyUpdated, surveyTemplate(surveyUpdated));			
+			const userSaved = await discountUserCredit(req);
+
+			res.status(208).send(userSaved);
+		}
+	);
+
+	app.post(
 		'/api/surveys', 
 		requireLogin, requireCredit, 
 		async (req, res) => {
-			const { title, subject, body, recipients } = req.body;
-			const survey = new Survey({
-				title,
-				subject,
-				body,
-				recipients,
-				_user: req.user.id,
-				dateSent: Date.now()
-			});
-
 			try {
-				await mailer(survey, surveyTemplate(survey));
-				await survey.save();
+				const surveySaved = await saveSurveySent(req.body, req.user.id);
+				await mailer(surveySaved, surveyTemplate(surveySaved));
 				const userSaved = await discountUserCredit(req);
 
 				res.status(201).send(userSaved);
@@ -93,6 +105,47 @@ module.exports = app => {
 	});
 
 };
+
+async function saveSurveySent(survey, userId) {
+	const { title, subject, body, recipients } = survey;
+	const surveySaved = new Survey({
+		title,
+		subject,
+		body,
+		recipients,
+		_user: userId,
+		dateSent: Date.now(),
+		status: SENT
+	});
+	await surveySaved.save();
+	return surveySaved;
+}
+
+async function updateSurveyToSent(surveyId) {
+	const byIdFilter = { _id: surveyId };
+	const fieldsToUpdate = {
+		dateSent: Date.now(),
+		status: SENT
+	};
+	const configToReturnUpdated = { returnOriginal: false };
+	
+	const surveyUpdated = await Survey.findOneAndUpdate(byIdFilter, fieldsToUpdate, configToReturnUpdated);
+
+	return surveyUpdated;
+}
+
+async function saveSurveyDraft(survey, userId) {
+	const { title, subject, body, recipients } = survey;
+	const surveySaved = new Survey({
+		title,
+		subject,
+		body,
+		recipients,
+		_user: userId,
+		status: DRAFT
+	});
+	await surveySaved.save();
+}
 
 function discountUserCredit(req) {
 	const creditToDiscountAfterSendEmail = 1;

@@ -9,6 +9,10 @@ require('./models/Survey');
 require('./services/passport');
 
 mongoose.connect(keys.mongoURI);
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
 
 const app = express();
 

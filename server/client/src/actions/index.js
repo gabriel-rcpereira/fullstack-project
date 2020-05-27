@@ -34,6 +34,19 @@ export const submitSurvey = (values, history) => async dispatch => {
 	dispatchFetchUser(dispatch, res);
 };
 
+export const saveSurvey = (values, history) => async dispatch => {
+	const recipientsTreated = treatRecipients(values);
+
+	const body = { 
+		...values, 
+		recipients: recipientsTreated
+	};
+	const res = await axios.post('/api/v2/surveys/drafts', body);
+
+	history.push('/surveys');
+	dispatchFetchUser(dispatch, res);
+};
+
 export const fetchSurveys = () => async dispatch => {
 	const res = await axios.get('/api/surveys');
 	dispatch({
