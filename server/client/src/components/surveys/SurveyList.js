@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
-import axios from 'axios';
 
-import { fetchSurveys } from '../../actions';
+import { fetchSurveys, sendSurvey, deleteSurvey } from '../../actions';
 
 import ModalConfirm from '../modals/ModalConfirm';
 
@@ -69,14 +68,16 @@ class SurveyList extends React.Component {
 		this.modalRef.click();
 	}
 
-	sendSurvey = async ({ _id }) => {
-		await axios.post(`/api/v2/surveys/${_id}`);
-		this.props.fetchSurveys();
+	handleSendSurvey = (e, { _id }) => {
+		e.preventDefault();
+
+		this.props.sendSurvey(_id);
 	}
 	
-	deleteSurvey = async () => {
-		await axios.delete(`/api/surveys/${this.state.surveyIdToDelete}`);
-		this.props.fetchSurveys();
+	handleOkDelete = (e) => {
+		e.preventDefault();
+		
+		this.props.deleteSurvey(this.state.surveyIdToDelete);
 	}
 
 	setSurveyToDelete = (id, title) => {
@@ -116,7 +117,7 @@ class SurveyList extends React.Component {
 		return (
 			<button 
 				className="teal lighten-2 btn-flat black-text" 
-				onClick={() => this.sendSurvey(survey)}
+				onClick={(e) => this.handleSendSurvey(e, survey)}
 			>
 				<i className="small material-icons">send</i>
 			</button>
@@ -136,7 +137,7 @@ class SurveyList extends React.Component {
 								{survey.body}
 							</p>
 							<p className="right">
-								{survey.dateSent ? this.renderSentOnMessage(survey) : 'Survey not sent'}
+								{survey.dateSent ? this.renderSentOnMessage(survey) : 'Draft'}
 							</p>
 						</div>
 						<div className="card-action teal lighten-2 white-text">
@@ -160,7 +161,7 @@ class SurveyList extends React.Component {
 				<ModalConfirm 
 					modalRef={this.setModalRef} 
 					modalTitle={'Confirm'} 
-					onOk={this.deleteSurvey} 
+					onOk={this.handleOkDelete} 
 					onCloseEnd={this.cleanSurveyIdToDelete} 
 				>
 					The Survey <b>{this.state.surveyTitleToDelete}</b> will be deleted. Could you confirm?
@@ -177,4 +178,4 @@ const mapStateToProps = ({ surveys }) => {
 	};
 };
 
-export default connect(mapStateToProps, { fetchSurveys })(SurveyList);
+export default connect(mapStateToProps, { fetchSurveys, sendSurvey, deleteSurvey })(SurveyList);

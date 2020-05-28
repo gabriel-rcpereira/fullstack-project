@@ -67,8 +67,10 @@ module.exports = app => {
 		'/api/v2/surveys/drafts', 
 		requireLogin, 
 		async (req, res) => {
-			await saveSurveyDraft(req.body, req.user.id);
-			res.status(201).send();
+			const user = req.user;
+			await saveSurveyDraft(req.body, user.id);
+
+			res.status(201).send(user);
 		}
 	);
 
